@@ -1,4 +1,4 @@
-# Kafka Intermediate - FAANG Interview Notes
+# Kafka Intermediate
 
 ## 1. Consumer Pull Loop
 
