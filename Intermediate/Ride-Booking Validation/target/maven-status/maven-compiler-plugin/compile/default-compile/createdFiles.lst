@@ -1,0 +1,6 @@
+com/kafka/ride/RideValidator$1.class
+com/kafka/ride/RideEventSerializer.class
+com/kafka/ride/ValidatorUtils.class
+com/kafka/ride/RideRequestProducer.class
+com/kafka/ride/RideValidator.class
+com/kafka/ride/RideRequest.class

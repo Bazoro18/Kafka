@@ -8,9 +8,9 @@ import java.util.UUID;
 
 public class RideRequestProducer {
 
-    private static final String BOOTSTRAP_SERVERS = "localhost:9092";
-    private static final String TOPIC = "ride_requests";
-    private static final Random random = new Random();
+    public static final String BOOTSTRAP_SERVERS = "localhost:9092";
+    public static final String TOPIC = "ride_requests";
+    public static final Random random = new Random();
 
     public static void main(String[] args) throws Exception {
 
@@ -40,14 +40,14 @@ public class RideRequestProducer {
                 }
             });
 
-            Thread.sleep(500);
+            Thread.sleep(10);
         }
 
         producer.flush();
         producer.close();
     }
 
-    private static RideRequest generateRandomRideRequest(int index) {
+    public static RideRequest generateRandomRideRequest(int index) {
         String rideId = "RIDE_" + UUID.randomUUID();
         String userId = "USER_" + (1000 + index);
         String paymentMethod = (index % 3 == 0) ? null : "card";

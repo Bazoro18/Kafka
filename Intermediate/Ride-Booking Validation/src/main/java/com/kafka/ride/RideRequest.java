@@ -1,12 +1,12 @@
 package com.kafka.ride;
 
 public class RideRequest {
-    private String rideId;
-    private String userId;
-    private String pickup;
-    private String drop;
-    private String paymentMethod;
-    private double amount;
+    public String rideId;
+    public String userId;
+    public String pickup;
+    public String drop;
+    public String paymentMethod;
+    public double amount;
 
     public RideRequest() {
     }

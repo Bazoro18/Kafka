@@ -1,6 +1,7 @@
 package com.kafka.ride;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ public class RideValidator {
     private static final String INPUT_TOPIC = "ride_requests";
     private static final String VALID_TOPIC = "valid_rides";
     private static final String INVALID_TOPIC = "rejected_rides";
-    private static final String GROUP_ID = "ride-validator-group";
+    private static final String GROUP_ID = "ride-validator-group-quick";
     private static final String TXN_ID = "ride-validator-txn-1";
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -54,7 +55,7 @@ public class RideValidator {
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, GROUP_ID);
-        consumerProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
+        consumerProps.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(consumerProps);
@@ -71,20 +72,30 @@ public class RideValidator {
                 System.out.println("Partitions assigned: " + partitions);
             }
         });
-
+        System.out.println("Subscribed to topic: " + INPUT_TOPIC);
         System.out.println("RideValidator started. Listening for messages...");
-
+        int totalProcessed = 0;
         try {
             while (true) {
-                ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(500));
-                if (records.isEmpty()) continue;
-
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(1));
                 Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
-
+                if (records.isEmpty()) {
+                    System.out.println("No records received at " + Instant.now());
+                    consumer.poll(Duration.ofSeconds(15));
+                    System.out.println("Shutting down Gracefully");
+                    //Thread.sleep(500);
+                    consumer.close();
+                    producer.close();
+                } 
+                else {
+                    System.out.println("Fetched " + records.count() + " records at " + Instant.now());
+                }
                 producer.beginTransaction();
 
                 try {
                     for (ConsumerRecord<String, String> record : records) {
+                        System.out.println("Processing record with key: " + record.key());
+                        totalProcessed++;
                         String value = record.value();
                         RideRequest ride = objectMapper.readValue(value, RideRequest.class);
 
@@ -92,7 +103,7 @@ public class RideValidator {
                         String targetTopic = isValid ? VALID_TOPIC : INVALID_TOPIC;
 
                         producer.send(new ProducerRecord<>(targetTopic, ride.getRideId(), value));
-
+                        producer.send(new ProducerRecord<>("ride_requests_validated", ride.getRideId(), value));
                         // Optional: also log to audit topic
                         producer.send(new ProducerRecord<>("ride_audit", ride.getRideId(), "Processed"));
 
@@ -103,12 +114,12 @@ public class RideValidator {
                     // Attach offsets to transaction
                     producer.sendOffsetsToTransaction(currentOffsets, GROUP_ID);
                     producer.commitTransaction();
+                    System.out.println("Total records processed: " + totalProcessed);
                 } catch (Exception e) {
                     System.err.println("Error during processing: " + e.getMessage());
                     producer.abortTransaction();
                 }
             }
-
         } finally {
             consumer.close();
             producer.close();
