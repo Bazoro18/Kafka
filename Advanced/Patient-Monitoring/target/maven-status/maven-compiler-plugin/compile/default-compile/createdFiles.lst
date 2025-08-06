@@ -1,0 +1,5 @@
+main/java/com/hospital/model/VitalsConsumer.class
+main/java/com/hospital/model/VitalsSerializer.class
+main/java/com/hospital/model/Vitals.class
+main/java/com/hospital/model/VitalsProducer.class
+main/java/com/hospital/model/VitalsDeserializer.class

@@ -1,0 +1,5 @@
+/home/atmos/KafkaInDepth/Kafka/Advanced/Patient-Monitoring/src/main/java/com/hospital/model/VitalsSerializer.java
+/home/atmos/KafkaInDepth/Kafka/Advanced/Patient-Monitoring/src/main/java/com/hospital/model/VitalsProducer.java
+/home/atmos/KafkaInDepth/Kafka/Advanced/Patient-Monitoring/src/main/java/com/hospital/model/Vitals.java
+/home/atmos/KafkaInDepth/Kafka/Advanced/Patient-Monitoring/src/main/java/com/hospital/model/VitalsDeserializer.java
+/home/atmos/KafkaInDepth/Kafka/Advanced/Patient-Monitoring/src/main/java/com/hospital/model/VitalsConsumer.java
